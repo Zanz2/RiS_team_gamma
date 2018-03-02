@@ -3,7 +3,7 @@
 #int8 BAR=2
 #request fields
 #string content
-int32[] intArr
+int32[10] intArr
 #another_pkg/AnotherMessage msg
 ---
 #response constants
