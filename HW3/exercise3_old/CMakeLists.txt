@@ -19,7 +19,3 @@ include_directories(include ${catkin_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS})
 add_executable(map_goals src/map_goals.cpp)
 target_link_libraries(map_goals ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
 
-add_executable(map_goals_dn src/map_goals_dn.cpp)
-target_link_libraries(map_goals_dn ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
-
-
