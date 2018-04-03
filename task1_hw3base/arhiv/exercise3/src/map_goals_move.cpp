@@ -1,8 +1,8 @@
 #include "ros/ros.h"
+
 #include <nav_msgs/GetMap.h>
 #include <geometry_msgs/Quaternion.h>
 #include <geometry_msgs/PoseStamped.h>
-#include <geometry_msgs/Twist.h>
 #include <actionlib/client/simple_action_client.h>
 #include <tf/transform_datatypes.h>
 #include <opencv2/core/core.hpp>
@@ -82,60 +82,10 @@ void mapCallback(const nav_msgs::OccupancyGridConstPtr& msg_map) {
 }
 
 void location() {
-  //cout << "123";
-  //MoveBaseClient ac("move_base", true);
-  /*while(!ac.waitForServer(ros::Duration(5.0)))
-  {
-    ROS_INFO("Waiting for move_base server");
-  }*/
-  //ros::Rate rate(1);
-  //ros::NodeHandle nh;
-  //ros::Publisher pub = nh.advertise<geometry_msgs::Twist>("cmd_vel",1000);
-  //geometry_msgs::Twist msgc;
-  //ros::Rate rate(1);
 
-  float rotacijeWZ[6][2] = {
-    {0.866, 0.500},
-    {0.500, 0.866},
-    {0, 1},
-    {-0.5, 0.866},
-    {0.5, -0.866},
-    {0.866, -0.5}
-  };
-  //move_base_msgs::MoveBaseGoal goal;
-  /*
-  for(int i=0;i<6;i++) {
-    ROS_INFO("rotate start");
-    //float asd = 1 - (i*0.25);
+  MoveBaseClient ac("move_base", true);
 
-    //cout << 1 - (i*0.25);
 
-    //msgc.angular.z = i;
-    //pub.publish(msgc);
-    //rate.sleep();
-
-    cout << rotacijeWZ[i][0];
-    cout << '\n';
-    cout << rotacijeWZ[i][1];
-
-    goal.target_pose.header.frame_id = "map";
-    goal.target_pose.pose.orientation.w = rotacijeWZ[i][0];//1 - (i*1);
-    goal.target_pose.pose.orientation.z = rotacijeWZ[i][1];
-    goal.target_pose.pose.position.x = -0.3;//transformed.x();
-    goal.target_pose.pose.position.y = -3.2;
-
-    //goal.target_pose.pose.position.x = 0;//transformed.x();
-    //goal.target_pose.pose.position.y = 0;
-    goal.target_pose.header.stamp = ros::Time::now();
-    ROS_INFO("rotate start2");
-    ac.sendGoal(goal);
-    ROS_INFO("rotate start3");
-    ac.waitForResult();
-    ROS_INFO("rotate start4");
-    //rate.sleep();
-
-    ROS_INFO("rotate");
-  }*/
 
   //now = rospy.Time.now();
   //listener.waitForTransform('map', 'base_footprint', now, rospy.Duration(10.0))
@@ -146,7 +96,7 @@ void location() {
     ROS_INFO("Waiting for move_base server");
   }
 
-  float points[8][2] = {
+  int points[8][2] = {
     {-0.3, -1.1},
     {-0.3, -2},
     {-1.5, -2},
@@ -198,64 +148,7 @@ void location() {
     ac.sendGoal(goal);
     ac.waitForResult();
     if(ac.getState() == actionlib::SimpleClientGoalState::SUCCEEDED)
-    {
       ROS_INFO("WE DID IT");
-
-      for(int i=0;i<6;i++) {
-        ROS_INFO("rotate start");
-        //float asd = 1 - (i*0.25);
-
-        //cout << 1 - (i*0.25);
-
-        //msgc.angular.z = i;
-        //pub.publish(msgc);
-        //rate.sleep();
-
-        cout << rotacijeWZ[i][0];
-        cout << '\n';
-        cout << rotacijeWZ[i][1];
-
-        goal.target_pose.header.frame_id = "map";
-        goal.target_pose.pose.orientation.w = rotacijeWZ[i][0];//1 - (i*1);
-        goal.target_pose.pose.orientation.z = rotacijeWZ[i][1];
-        goal.target_pose.pose.position.x = point[0];//transformed.x();
-        goal.target_pose.pose.position.y = point[1];
-
-        //goal.target_pose.pose.position.x = 0;//transformed.x();
-        //goal.target_pose.pose.position.y = 0;
-        goal.target_pose.header.stamp = ros::Time::now();
-        //ROS_INFO("rotate start2");
-        ac.sendGoal(goal);
-        //ROS_INFO("rotate start3");
-        ac.waitForResult();
-        //ROS_INFO("rotate start4");
-        //rate.sleep();
-
-        ROS_INFO("rotated");
-
-        ROS_INFO("searching for circles");
-        PyObject* PyFileObject = PyFile_FromString("RingDetect_v3.py","r")
-        PyRun_SimpleFileEx(PyFile_AsFile(PyFileObject),"RingDetect_v3.py",1)
-        ROS_INFO("done searching");
-
-
-      /*
-      for(int i=0;i<7;i++) {
-        goal.target_pose.pose.orientation.w = 0.75 - (i*0.25);
-        goal.target_pose.header.stamp = ros::Time::now();
-        ac.sendGoal(goal);
-        ac.waitForResult();
-        ROS_INFO("rotate");
-
-        //FILE *fd = fopen("RingDetect.py", "r");
-        //PyRun_SimpleFileEx(fd, "RingDetect.py", 1);
-        PyObject* PyFileObject = PyFile_FromString("RingDetect_v2.py","r")
-        PyRun_SimpleFileEx(PyFile_AsFile(PyFileObject),"RingDetect_v2.py",1)
-        /*FILE *fd = fopen("rotate.py", "r");
-        PyRun_SimpleFileEx(fd, "rotate.py", 1);
-      }
-      */
-    }
       //pokliči python file, pa si zapomni kje so krogi če so kje
       //če najde krog naj neki reče
       //rotiraj se za 45
@@ -264,7 +157,6 @@ void location() {
       ROS_INFO("rip");
   }
 }
-
 
 int main(int argc, char** argv) {
   ROS_INFO("test1");
