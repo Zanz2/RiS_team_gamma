@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 from __future__ import print_function
 
-#import roslib
-# roslib.load_manifest('exercise4')
+import roslib
+roslib.load_manifest('exercise4')
 import sys
 import cv2
 import numpy as np
