@@ -6,24 +6,24 @@ from __future__ import print_function
 import sys
 import cv2
 import numpy as np
+import os
+import rospy
 
-#import rospy
+import tf
 
-#import tf
-
-#import tf2_geometry_msgs
-#import tf2_ros
-#from sensor_msgs.msg import Image
-#from geometry_msgs.msg import PointStamped, Vector3, Pose
-#from cv_bridge import CvBridge, CvBridgeError
-#from visualization_msgs.msg import Marker, MarkerArray
-#from std_msgs.msg import ColorRGBA
-
+import tf2_geometry_msgs
+import tf2_ros
+from sensor_msgs.msg import Image
+from geometry_msgs.msg import PointStamped, Vector3, Pose
+from cv_bridge import CvBridge, CvBridgeError
+from visualization_msgs.msg import Marker, MarkerArray
+from std_msgs.msg import ColorRGBA
+from sound_play.msg import SoundRequest
+from sound_play.libsoundplay import SoundClient
 
 class The_Ring:
     def __init__(self):
         rospy.init_node('image_converter', anonymous=True)
-
         # An object we use for converting images between ROS format and OpenCV format
         self.bridge = CvBridge()
 
@@ -36,7 +36,7 @@ class The_Ring:
 
         # Subscribe to the image and/or depth topic
         self.image_sub = rospy.Subscriber("/camera/rgb/image_color", Image, self.image_callback)
-        # self.depth_sub = rospy.Subscriber("/camera/depth_registered/image_raw", Image, self.depth_callback)
+        self.depth_sub = rospy.Subscriber("/camera/depth_registered/image_raw", Image, self.depth_callback)
 
         # Publiser for the visualization markers
         self.markers_pub = rospy.Publisher('markers', MarkerArray, queue_size=1000)
@@ -44,7 +44,7 @@ class The_Ring:
         # Object we use for transforming between coordinate frames
         self.tf_buf = tf2_ros.Buffer()
         self.tf_listener = tf2_ros.TransformListener(self.tf_buf)
-
+	print("between fuck 1")
 
     def get_pose(self,e,dist):
         # Calculate the position of the detected ellipse
@@ -95,13 +95,15 @@ class The_Ring:
 
 #KODA!!!!!
     def image_callback(self,data):
-        # print('Iam here!')
+	#def image_callback(self,data):
+        print('Iam here!')
 
         sizeX = 640
         sizeY = 360
 
         try:
             cv_image = self.bridge.imgmsg_to_cv2(data, "bgr8")
+	    #cv_image = cv2.imread('Img.jpg')
         except CvBridgeError as e:
             print(e)
 
@@ -116,7 +118,7 @@ class The_Ring:
 
         # Do histogram equlization
         img = cv2.equalizeHist(gray)
-
+	print('Iam here!2')
         # Binarize the image
         #ret, thresh = cv2.threshold(img, 50, 255, 0)
         thresholds = []
@@ -132,10 +134,10 @@ class The_Ring:
         # Extract contours
         allContours = [[], [], [], [], [], [], [], [], [], [], [], [], [], []]
         for i, thresh in enumerate(thresholds):
-            contours, hierarchy = cv2.findContours(thresh, 2, 2)
+            _,contours, hierarchy = cv2.findContours(thresh, 2, 2)
             for contoure in contours:
                 allContours[i].append(contoure)
-
+	print('Iam here!3')
         # Example how to draw the contours
         # cv2.drawContours(img, contours, -1, (255, 0, 0), 3)
 
@@ -177,7 +179,7 @@ class The_Ring:
                         # if i==2:
                         # print (pos)
                         candidates.append((e1, e2, pos))
-
+	print('Iam here!4')
         realCandidates = []
         used = []
         for n in range(len(candidates)):
@@ -196,11 +198,13 @@ class The_Ring:
                     # print(n, " ", m)
                     break
 
-        try:
-            depth_img = rospy.wait_for_message('/camera/depth_registered/image_raw', Image)
+	print('Iam here!4.5')        
+	try:
+       	    depth_img = rospy.wait_for_message('/camera/depth_registered/image_raw', Image)
+	    ne_me_jebat = True
         except Exception as e:
             print(e)
-
+	print('Iam here!5')
         # Extract the depth from the depth image
         for c in realCandidates:
 
@@ -226,12 +230,11 @@ class The_Ring:
             depth_image = self.bridge.imgmsg_to_cv2(depth_img, "16UC1")
 
             self.get_pose(e1, float(np.mean(depth_image[x_min:x_max,y_min:y_max,:]))/1000.0)
-
-
+            circle_detected_sound()
+	print("boom")
         cv2.imshow("Image window",cv_image)
         cv2.waitKey(1)
 # KODA!!!!!
-
     def depth_callback(self,data):
 
         try:
@@ -246,20 +249,32 @@ class The_Ring:
 
         image_viz = np.array(image_1, dtype= np.uint8)
 
-        cv2.imshow("Depth window", image_viz)
-        cv2.waitKey(1)
+        #cv2.imshow("Depth window", image_viz)
+        #cv2.waitKey(1)
 
+def circle_detected_sound():
+    soundhandle = SoundClient()
+    rospy.sleep(1)
+    soundhandle.stopAll()
+    s3 = soundhandle.voiceSound("AAAyyyyy")
+    s3.repeat()
+    rospy.sleep(1)
+    s3.stop()
 
 def main(args):
-
+    
+    print("fuck")
     ring_finder = The_Ring()
-
+    circle_detected_sound()
+    print("after fuck")
     try:
         rospy.spin()
+	print("way after fuck")
+
     except KeyboardInterrupt:
         print("Shutting down")
 
-    cv2.destroyAllWindows()
+    #cv2.destroyAllWindows()
 
 
 if __name__ == '__main__':
