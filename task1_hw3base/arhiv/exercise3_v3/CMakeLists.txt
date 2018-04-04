@@ -26,7 +26,3 @@ target_link_libraries(map_goals_dn ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
 
 add_executable(map_goals_move src/map_goals_move.cpp)
 target_link_libraries(map_goals_move ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
-
-find_package(PythonLibs REQUIRED)
-include_directories(${PYTHON_INCLUDE_DIRS})
-target_link_libraries(map_goals_move ${PYTHON_LIBRARIES})

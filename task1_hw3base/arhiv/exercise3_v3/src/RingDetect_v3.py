@@ -37,7 +37,6 @@ class The_Ring:
         # Subscribe to the image and/or depth topic
         self.image_sub = rospy.Subscriber("/camera/rgb/image_color", Image, self.image_callback)
         self.depth_sub = rospy.Subscriber("/camera/depth_registered/image_raw", Image, self.depth_callback)
-	
 
         # Publiser for the visualization markers
         self.markers_pub = rospy.Publisher('markers', MarkerArray, queue_size=1000)
@@ -111,7 +110,7 @@ class The_Ring:
         # Set the dimensions of the image
         self.dims = cv_image.shape
 
-        cv_image = cv_image[0: sizeY / 5 * 4, 0:sizeX/5*4]
+        cv_image = cv_image[sizeY / 4 * 2: sizeY, 0:sizeX]
         #cv_image = cv2.resize(cv_image, (sizeX, sizeY), interpolation=cv2.INTER_CUBIC)
 
         # Tranform image to gayscale
@@ -128,8 +127,8 @@ class The_Ring:
         for tr in range(20, 180, 15):
             ret, thresh = cv2.threshold(img, tr, 255, 0)
             thresholds.append(thresh)
-            #cv2.imshow("Image window", thresh)
-            #cv2.waitKey(0)
+            cv2.imshow("Image window", thresh)
+            cv2.waitKey(0)
 
         # Extract contours
         # Extract contours
@@ -172,13 +171,13 @@ class The_Ring:
                         razmerje2 = e1[1][1] / e2[1][1]
                     except:
                         break
-                    #print(pos[1])
+                    #print(e1)
                     if dist < 5 and ((razmerje < 1.5 and razmerje > 1.1) or (razmerje < 0.9 and razmerje > 0.6)) and (
-                        (razmerje2 < 1.5 and razmerje2 > 1.1) or (razmerje2 < 0.9 and razmerje2 > 0.6)) and pos[1] < sizeY/3*2:# and pos[
-                        #1] > 0 and pos[1] < (sizeY / 2 / 4) * 3:
+                        (razmerje2 < 1.5 and razmerje2 > 1.1) or (razmerje2 < 0.9 and razmerje2 > 0.6)) and pos[
+                        1] > sizeY / 2 / 4 and pos[1] < (sizeY / 2 / 4) * 3:
                         # i += 1
                         # if i==2:
-                        #print (e1)
+                        print (e1)
                         candidates.append((e1, e2, pos))
 	print('Iam here!4')
         realCandidates = []
@@ -208,8 +207,8 @@ class The_Ring:
 	print('Iam here!5')
         # Extract the depth from the depth image
         for c in realCandidates:
-            #print("real")
-            #print(c)
+            print("real")
+            print(c)
             e1 = c[0]
             e2 = c[1]
 
@@ -230,24 +229,23 @@ class The_Ring:
             y_max = y2 if y2 < cv_image.shape[1] else cv_image.shape[1]
 
             depth_image = self.bridge.imgmsg_to_cv2(depth_img, "16UC1")
-            #print(x_min)
-            #print(x_max)
-            #print(y_min)
-            #print(y_max)
+            print(x_min)
+            print(x_max)
+            print(y_min)
+            print(y_max)
             
-            depth_image = depth_image[0: sizeY/5*4, 0:sizeX/5*4]
             #cv2.imshow("Image window",depth_image)
             #cv2.waitKey(0)
             #print(depth_image)
             #print(float(np.mean(depth_image[0:1, 0:1]))/1000.0)
-            
-            #print(float(np.mean(depth_image[x_min:x_max,y_min:y_max]))/1000.0)
+            depth_image = depth_image[sizeY / 4 * 2: sizeY, 0:sizeX]
+            print(float(np.mean(depth_image[x_min:x_max,y_min:y_max]))/1000.0)
 
             self.get_pose(e1, float(np.mean(depth_image[x_min:x_max,y_min:y_max]))/1000.0)
             circle_detected_sound()
 	print("boom")
-        #cv2.imshow("Image window",cv_image)
-        #cv2.waitKey(0)
+        cv2.imshow("Image window",cv_image)
+        cv2.waitKey(0)
 
 	rospy.signal_shutdown("lol")
 	sys.exit(0)

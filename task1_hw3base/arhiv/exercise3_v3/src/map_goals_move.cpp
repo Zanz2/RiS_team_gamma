@@ -13,7 +13,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include <Python.h>
 
 using namespace std;
 using namespace cv;
@@ -26,7 +25,6 @@ ros::Publisher goal_pub;
 ros::Subscriber map_sub;
 
 typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> MoveBaseClient;
-
 
 void location();
 
@@ -84,9 +82,8 @@ void mapCallback(const nav_msgs::OccupancyGridConstPtr& msg_map) {
 }
 
 void location() {
-
   //cout << "123";
-  MoveBaseClient ac("move_base", true);
+  //MoveBaseClient ac("move_base", true);
   /*while(!ac.waitForServer(ros::Duration(5.0)))
   {
     ROS_INFO("Waiting for move_base server");
@@ -237,42 +234,10 @@ void location() {
         ROS_INFO("rotated");
 
         ROS_INFO("searching for circles");
-	
-	system("python /home/team_gamma/ROS/src/exercise3/src/RingDetect_v3.py");
-
-	/*
-	Py_Initialize();
-	char filename[] = "/home/team_gamma/ROS/src/exercise3/src/RingDetect_v3.py";
-	FILE* PythonScriptFile = fopen(filename,"r");
-	if(PythonScriptFile)
-	{
-	PyRun_SimpleFile(PythonScriptFile, filename);
-	fclose(PythonScriptFile);
-	ROS_INFO("aa");
-	}
-	Py_Finalize();
-*/
-/*
-	PyObject *obj = Py_BuildValue("s", "RingDetect_v3.py");
-	FILE *file = _Py_fopen_obj(obj, "r+");
-
-	if(file != NULL)
-	{
-		PyRun_SimpleFIle(file, "RingDetect_v3.py");
-	}
-	*/
-	//FILE *fd = fopen("RingDetect_v3.py", "r");
-	//ROS_INFO("asd");
-        //PyRun_SimpleFileEx(fd, "RingDetect_v3.py", 1);
-	//Py_Initialize();
-	//ROS_INFO("A");
-        //PyObject* PyFileObject = PyFile_FromString((char *)"RingDetect_v3.py","r");
-	//ROS_INFO("B");
-        //PyRun_SimpleFileEx(PyFile_AsFile(PyFileObject),"RingDetect_v3.py",1);
-	//ROS_INFO("C");
-	//Py_Finalize();
+        PyObject* PyFileObject = PyFile_FromString("RingDetect_v3.py","r")
+        PyRun_SimpleFileEx(PyFile_AsFile(PyFileObject),"RingDetect_v3.py",1)
         ROS_INFO("done searching");
-	}
+
 
       /*
       for(int i=0;i<7;i++) {
