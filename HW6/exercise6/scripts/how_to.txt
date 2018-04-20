@@ -1,0 +1,16 @@
+# Prvo je treba v launch file dat številko robotske roke
+# Pol zalaufat launch file, pa python file, pa roscore
+
+rostopic pub /set_manipulator_position std_msgs/Int8 "data: 0"
+rostopic pub /set_manipulator_position std_msgs/Int8 "data: 1"
+rostopic pub /set_manipulator_position std_msgs/Int8 "data: 2"
+rostopic pub /set_manipulator_position std_msgs/Int8 "data: 3"
+rostopic pub /set_manipulator_position std_msgs/Int8 "data: 4"
+
+# spravi roko v pozicijo 1.
+
+rostopic pub openservorobot/move_joint_to openservorobot/Movoint -- '1' '3' '0'
+
+# spravi joint 1 v roki na pozicijo 3, zadni argument speed je nepomembn
+
+# v control manipulator v2 so pozicije roke za dvigovanje
