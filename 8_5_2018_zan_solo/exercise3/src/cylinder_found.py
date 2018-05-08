@@ -10,7 +10,7 @@ soundhandle = SoundClient()
 rospy.sleep(1)
 soundhandle.stopAll()
 
-s3 = soundhandle.voiceSound("Cilinder found" ,5)
+s3 = soundhandle.voiceSound("Object found" ,5)
 s3.play()
 rospy.sleep(3)
 s3.stop()
@@ -18,7 +18,7 @@ s3.stop()
 '''
 soundhandle = SoundClient()
 soundhandle.stopAll()
-    
+
 s3 = soundhandle.voiceSound("Cylinder found" ,5)
 s3.play()
 sleep(3)

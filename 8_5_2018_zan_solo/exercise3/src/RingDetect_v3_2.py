@@ -37,7 +37,7 @@ class The_Ring:
         # Subscribe to the image and/or depth topic
         self.image_sub = rospy.Subscriber("/camera/rgb/image_color", Image, self.image_callback)
         self.depth_sub = rospy.Subscriber("/camera/depth_registered/image_raw", Image, self.depth_callback)
-	
+
 
         # Publiser for the visualization markers
         self.markers_pub = rospy.Publisher('markers', MarkerArray, queue_size=1000)
@@ -88,13 +88,13 @@ class The_Ring:
 	    print(koor)
 	    razdaljaX = abs(float(koor[0])-pose.position.x)
 	    razdaljaY = abs(float(koor[1])-pose.position.y)
-	    
+
             if razdaljaX < 0.4 and razdaljaY < 0.4:
 		return
 
-	    
 
-	
+
+
 
         # Create a marker used for visualization
         self.marker_num += 1
@@ -116,8 +116,7 @@ class The_Ring:
 
 	#with open("/home/team_gamma/ROS/src/exercise3/src/rings.txt", "a") as the_file:
 	#    the_file.write(str(pose.position.x) + ";" + str(pose.position.y) + "\n")
-	
-	circle_detected_sound()
+
 	print("marker " + str(pose.position.x) + ";" + str(pose.position.y) + " shranjen")
 
 #KODA!!!!!
@@ -225,7 +224,7 @@ class The_Ring:
                     # print(n, " ", m)
                     break
 
-	print('Iam here!4.5')        
+	print('Iam here!4.5')
 	try:
        	    depth_img = rospy.wait_for_message('/camera/depth_registered/image_raw', Image)
         except Exception as e:
@@ -259,17 +258,17 @@ class The_Ring:
             #print(x_max)
             #print(y_min)
             #print(y_max)
-            
+
             #depth_image = depth_image[0: sizeY/5*4, 0:sizeX/5*4]
             #cv2.imshow("Image window",depth_image)
             #cv2.waitKey(0)
             #print(depth_image)
             #print(float(np.mean(depth_image[0:1, 0:1]))/1000.0)
-            
+
             #print(float(np.mean(depth_image[x_min:x_max,y_min:y_max]))/1000.0)
 
             self.get_pose(e1, float(np.mean(depth_image[x_min:x_max,y_min:y_max]))/1000.0)
-            
+
 	print("boom")
         #cv2.imshow("Image window",cv_image)
         #cv2.waitKey(0)
@@ -294,22 +293,12 @@ class The_Ring:
         #cv2.imshow("Depth window", image_viz)
         #cv2.waitKey(1)
 
-def circle_detected_sound():
-    soundhandle = SoundClient()
-    rospy.sleep(1)
-    soundhandle.stopAll()
-    
-    s3 = soundhandle.voiceSound("Marker found" ,5)
-    s3.play()
-    rospy.sleep(3)
-    s3.stop()
-
 def main(args):
     print("fuck")
     ring_finder = The_Ring()
     #circle_detected_sound()
     print("after fuck")
-    
+
     #try:
     #    rospy.spin()
     #	print("way after fuck")

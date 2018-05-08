@@ -73,8 +73,60 @@ bool cylinderMarkerExists(float x_point,float y_point){
   }
   return false;
 }
+void circleAddToArray(float x_point,float y_point){
+  for(int i=0;i<10;i++){
+    if(circle_marker_array_x[i] == -666){
+      if(circle_marker_array_y[i] == -666){
+        circle_marker_array_x = x_point;
+        circle_marker_array_y = y_point;
+      }
+    }
+  }
+}
+int circleMarkerCount(){
+  for(int i=0;i<10;i++){
+    if(circle_marker_array_x[i] == -666){
+      return i;
+    }
+  }
+}
+bool circleMarkerExists(float x_point,float y_point){
+  float deviation = 5; // can deviate for 5 coordinates or whatever unit
+
+  for(int i=0;i<10;i++){
+    if(x_point >= circle_marker_array_x[i]-deviation && x_point <= circle_marker_array_x[i]+deviation){
+      if(y_point >= circle_marker_array_y[i]-deviation && y_point <= circle_marker_array_y[i]+deviation){
+        return true;
+      }
+    }
+    if(circle_marker_array_x[i] == -666){
+      if(circle_marker_array_y[i] == -666){
+        return false;
+      }
+    }
+  }
+  return false;
+}
 void circleCallback(const visualization_msgs::MarkerArray& msg_marker){
   ROS_INFO("circle callback: x:%f y:%f",msg_marker.markers[0].pose.position.x,msg_marker.markers[0].pose.position.y);
+  if(circleMarkerExists(msg_marker.markers[0].pose.position.x,msg_marker.markers[0].pose.position.y)){
+    return;
+  }
+  circleAddToArray(msg_marker.markers[0].pose.position.x,msg_marker.markers[0].pose.position.y)
+  system("python /home/team_gamma/ROS/src/exercise3/src/cylinder_found.py");
+  MoveBaseClient ac("move_base", true);
+  move_base_msgs::MoveBaseGoal goal;
+  goal.target_pose.header.frame_id = "map";
+  goal.target_pose.pose.orientation.w = 1;
+  goal.target_pose.pose.position.x = msg_marker.markers[0].pose.position.x;//transformed.x();
+  goal.target_pose.pose.position.y = msg_marker.markers[0].pose.position.y;//-transformed.y();
+  goal.target_pose.header.stamp = ros::Time::now();
+  ac.sendGoal(goal);
+  ac.waitForResult();
+  if(ac.getState() == actionlib::SimpleClientGoalState::SUCCEEDED)
+  {
+    ROS_INFO("Circle succesfully approached!")
+  }
 }
 
 void cylinderCallback(const visualization_msgs::Marker& msg_marker){
