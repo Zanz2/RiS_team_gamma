@@ -1,0 +1,8 @@
+<launch>
+
+  <node pkg="exercise3" type="competitionRun" name="competitionRun" output="screen">
+      <remap from="goal" to="/competitionRun/goal" />
+  </node>
+
+</launch>
+

@@ -1,0 +1,52 @@
+#!/usr/bin/env python
+from __future__ import print_function
+
+import roslib
+import os
+import sys
+import rospy
+import cv2
+from sensor_msgs.msg import Image
+from cv_bridge import CvBridge
+
+img_id = 0;
+
+class The_Rectifier:
+    def __init__(self):
+        rospy.init_node('image_converter', anonymous=True)
+
+        # An object we use for converting images between ROS format and OpenCV format
+        self.bridge = CvBridge()
+
+        # Subscribe to the image and/or depth topic
+        self.image_sub = rospy.Subscriber("/camera/rgb/image_color", Image, self.image_callback)
+
+    def image_callback(self,data):
+        # print('Iam here!')
+
+        try:
+            cv_image = self.bridge.imgmsg_to_cv2(data, "bgr8")
+        except CvBridgeError as e:
+            print(e)
+
+        #cv2.imshow("Image window", cv_image)
+        #cv2.waitKey(0)
+
+        if(input("s-save, x-do not save: ") == "s")
+            cv2.imwrite(os.path.join("/home/team_gamma/ROS/src/exercise8/scripts/images", 'image' + img_id + '.jpg'), cv_image)
+            cv2.waitKey(0)
+
+def main(args):
+
+    ring_rectifier = The_Rectifier()
+
+    try:
+        rospy.spin()
+    except KeyboardInterrupt:
+        print("Shutting down")
+
+    cv2.destroyAllWindows()
+
+
+if __name__ == '__main__':
+    main(sys.argv)
