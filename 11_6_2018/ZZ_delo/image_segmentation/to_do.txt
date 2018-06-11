@@ -1,0 +1,36 @@
+-številke
+-graf
+-qr koda
+
+-barve
+
+-premikanje robota
+-približevanje robota
+
+-popravi cilindre
+-roka
+
+
+Da se dobijo toèke tudi èe gre kaj anrobe je potreban vizualizacija
+
+Izpis stvari, ko se zaznajo in prikaz na mapi.
+Reciimo, ko se zazna krog, se nariše na mapi, potem se preberejo številke, ki se izpišejo na zaslon. Na koncu,
+se tudi izpiše v katere cilindre bi robot naj vrgel kovance.
+
+Tako dobimo toèke tudi èe se robot izgubi.
+
+
+
+Jaka
+-popravi cilindre
+-premikanje robota
+-približevanje
+-roka
+
+Žan Ž.
+-barve
+-qr koda
+
+Žan P.
+-graf
+-številke
