@@ -48,7 +48,7 @@ class The_Ring:
         # Object we use for transforming between coordinate frames
         self.tf_buf = tf2_ros.Buffer()
         self.tf_listener = tf2_ros.TransformListener(self.tf_buf)
-	print("between fuck 1")
+        print("between fuck 1")
 
     def get_pose(self,e,dist):
         # Calculate the position of the detected ellipse
@@ -80,20 +80,20 @@ class The_Ring:
         pose.position.y = point_world.point.y
         pose.position.z = point_world.point.z
 
-	koordinate = []
-	#with open("/home/team_gamma/ROS/src/exercise3/src/rings.txt", "r") as the_file:
-	#    for line in the_file:
-	#	linija = line.strip("\n").split(";")
-	#	koordinate.append((linija[0], linija[1]))
+        koordinate = []
+        #with open("/home/team_gamma/ROS/src/exercise3/src/rings.txt", "r") as the_file:
+        #    for line in the_file:
+        #	linija = line.strip("\n").split(";")
+        #	koordinate.append((linija[0], linija[1]))
 
-	for koor in koordinate:
+        for koor in koordinate:
 
-	    print(koor)
-	    razdaljaX = abs(float(koor[0])-pose.position.x)
-	    razdaljaY = abs(float(koor[1])-pose.position.y)
+            print(koor)
+            razdaljaX = abs(float(koor[0])-pose.position.x)
+            razdaljaY = abs(float(koor[1])-pose.position.y)
 
             if razdaljaX < 0.4 and razdaljaY < 0.4:
-		return
+                return
 
 
 
@@ -117,14 +117,13 @@ class The_Ring:
         self.markers_pub.publish(self.marker_array)
         print("sem poslal info za marker")
 
-	#with open("/home/team_gamma/ROS/src/exercise3/src/rings.txt", "a") as the_file:
-	#    the_file.write(str(pose.position.x) + ";" + str(pose.position.y) + "\n")
+        #with open("/home/team_gamma/ROS/src/exercise3/src/rings.txt", "a") as the_file:
+        #    the_file.write(str(pose.position.x) + ";" + str(pose.position.y) + "\n")
 
-	print("marker " + str(pose.position.x) + ";" + str(pose.position.y) + " shranjen")
+        print("marker " + str(pose.position.x) + ";" + str(pose.position.y) + " shranjen")
 
-#KODA!!!!!
     def image_callback(self,data):
-	#def image_callback(self,data):
+    #def image_callback(self,data):
         print('Iam here!')
 
         sizeX = 640
@@ -132,27 +131,27 @@ class The_Ring:
 
         try:
             cv_image = self.bridge.imgmsg_to_cv2(data, "bgr8")
-	    #cv_image = cv2.imread('Img.jpg')
+        #cv_image = cv2.imread('Img.jpg')
         except CvBridgeError as e:
             print(e)
 
         # Set the dimensions of the image
         self.dims = cv_image.shape
-	#print(cv_image.shape)
+        #print(cv_image.shape)
 
         cv_image = cv_image[sizeY/5: sizeY/5*4, 0:sizeX/5*4]
         #cv_image = cv2.resize(cv_image, (sizeX, sizeY), interpolation=cv2.INTER_CUBIC)
 
-	cv2.imshow("Image window", cv_image)
+        cv2.imshow("Image window", cv_image)
         cv2.waitKey(0)
 
         # Tranform image to gayscale
-	cv_image_hsv = cv2.cvtColor(cv_image, cv2.COLOR_BGR2HSV)
+        cv_image_hsv = cv2.cvtColor(cv_image, cv2.COLOR_BGR2HSV)
         gray = cv2.cvtColor(cv_image, cv2.COLOR_BGR2GRAY)
 
         # Do histogram equlization
         img = cv2.equalizeHist(gray)
-	print('Iam here!2')
+        print('Iam here!2')
         # Binarize the image
         #ret, thresh = cv2.threshold(img, 50, 255, 0)
         thresholds = []
@@ -171,7 +170,7 @@ class The_Ring:
             _,contours, hierarchy = cv2.findContours(thresh, 2, 2)
             for contoure in contours:
                 allContours[i].append(contoure)
-	print('Iam here!3')
+        print('Iam here!3')
         # Example how to draw the contours
         # cv2.drawContours(img, contours, -1, (255, 0, 0), 3)
 
@@ -213,7 +212,7 @@ class The_Ring:
                         # if i==2:
                         #print (e1)
                         candidates.append((e1, e2, pos))
-	print('Iam here!4')
+        print('Iam here!4')
         realCandidates = []
         used = []
         for n in range(len(candidates)):
@@ -232,58 +231,190 @@ class The_Ring:
                     # print(n, " ", m)
                     break
 
-	print('Iam here!4.5')
-	try:
-       	    depth_img = rospy.wait_for_message('/camera/depth_registered/image_raw', Image)
+        print('Iam here!4.5')
+        try:
+           	    depth_img = rospy.wait_for_message('/camera/depth_registered/image_raw', Image)
         except Exception as e:
             print(e)
-	print('Iam here!5')
-        # Extract the depth from the depth image
+        print('Iam here!5')
+            # Extract the depth from the depth image
         for c in realCandidates:
             print("CIRCLE FOUND!")
             #print(c)
             e1 = c[0]
             e2 = c[1]
 
-            cv2.ellipse(cv_image, e1, (0, 255, 0), 2)
-            cv2.ellipse(cv_image, e2, (0, 255, 0), 2)
+            if(e1[1][1]*e1[1][0]<e2[1][1]*e2[1][0]):
+				temp = e1
+				e1 = e2
+				e2 = temp
 
-            size = (e1[1][0]+e1[1][1])/2
-            center = (e1[0][1], e1[0][0])
 
-            x1 = int(center[0] - size / 2)
-            x2 = int(center[0] + size / 2)
-            x_min = x1 if x1>0 else 0
-            x_max = x2 if x2<cv_image.shape[0] else cv_image.shape[0]
+            # size = (e1[1][0]+e1[1][1])/2
+			sizex = (e1[1][0])/2
+			sizey = (e1[1][1])/2
+			sizex2 = (e2[1][0])/2
+			sizey2 = (e2[1][1])/2
+			#center = (e1[0][1], e1[0][0])
+			center = (e1[0][0], e1[0][1])
+			center2 = (e2[0][0], e2[0][1])
 
-            y1 = int(center[1] - size / 2)
-            y2 = int(center[1] + size / 2)
-            y_min = y1 if y1 > 0 else 0
-            y_max = y2 if y2 < cv_image.shape[1] else cv_image.shape[1]
+			dist = np.sqrt(((e1[0][0] - e2[0][0]) ** 2 + (e1[0][1] - e2[0][1]) ** 2))
+			print("sizex: "+str(sizex))
+			print("center: "+str(center))
 
-            depth_image = self.bridge.imgmsg_to_cv2(depth_img, "16UC1")
-            #print(x_min)
-            #print(x_max)
-            #print(y_min)
-            #print(y_max)
+			# elipse 1
+			# x1 = center[0] - sizex / 2
+			x1 = center[0] - sizex
+			print("x1: "+str(x1))
+			x2 = center[0] + sizex
+			print("x2: "+str(x2))
+			x_min = x1 if x1<x2 else x2
+			x_max = x2 if x2>x1 else x1
+			print("xmin: "+str(x_min))
+			print("xmax: "+str(x_max))
+			y1 = center[1] - sizey
+			y2 = center[1] + sizey
+			print("y1: "+str(y1))
+			print("y2: "+str(y2))
+			y_min = y1 if y1 < y2 else y2
+			y_max = y2 if y2 > y1 else y1
+			print("ymin: "+str(y_min))
+			print("ymax: "+str(y_max))
 
-            depth_image = depth_image[sizeY/5: sizeY/5*4, 0:sizeX/5*4]
-            #cv2.imshow("Image window",depth_image)
+			#elipse 2
+			x1_2 = center2[0] - sizex2
+			x2_2 = center2[0] + sizex2
+			x_min2 = x1_2 if x1_2 < x2_2 else x2_2
+			x_max2 = x2_2 if x2_2 > x1_2 else x1_2
+			print("xmin2: "+str(x_min2))
+			print("xmax2: "+str(x_max2))
+			y1_2 = center2[1] - sizey2
+			y2_2 = center2[1] + sizey2
+			y_min2 = y1_2 if y1_2 < y2_2 else y2_2
+			y_max2 = y2_2 if y2_2 > y1_2 else y1_2
+			print("ymin2: "+str(y_min2))
+			print("ymax2: "+str(y_max2))
+
+			x_max = x_max if x_max<cv_image.shape[0] else cv_image.shape[0]
+			y_max = y_max if y_max < cv_image.shape[1] else cv_image.shape[1]
+			x_max2 = x_max2 if x_max2<cv_image.shape[0] else cv_image.shape[0]
+			y_max2 = y_max2 if y_max2< cv_image.shape[1] else cv_image.shape[1]
+
+			x_min = x_min if x_min>0 else 0
+			y_min = y_min if y_min>0 else 0
+			x_min2 = x_min2 if x_min2>0 else 0
+			y_min2 = y_min2 if y_min2>0 else 0
+
+			# ne dela ker se prva pa druga elipsa zamenjata kakdaj
+
+			size_diffx = abs(sizex-sizex2)
+			size_diffy = abs(sizey-sizey2)
+			thick_x_right = (x_max2+x_max)/2
+			thick_x_left = (x_min2+x_min)/2
+			thick_y_bot = (y_max2+y_max)/2
+			thick_y_top = (y_min2+y_min)/2
+
+
+			left = [thick_x_left,center[1]]
+			right = [thick_x_right,center[1]]
+			top = [center[0],thick_y_top]
+			bot = [center[0],thick_y_bot]
+			bgr_point_left = cv_image[int(left[1]),int(left[0])]
+			hsv_point_left = cv_image_hsv[int(left[1]),int(left[0])]
+
+			bgr_point_right = cv_image[int(right[1]),int(right[0])]
+			hsv_point_right = cv_image_hsv[int(right[1]),int(right[0])]
+
+			bgr_point_top = cv_image[int(top[1]),int(top[0])]
+			hsv_point_top = cv_image_hsv[int(top[1]),int(top[0])]
+
+			bgr_point_bot = cv_image[int(bot[1]),int(bot[0])]
+			hsv_point_bot = cv_image_hsv[int(bot[1]),int(bot[0])]
+
+
+			# Opencv hsv to normal HSV conversion
+			hsv_point_left[0] = hsv_point_left[0] * 2
+			hsv_point_left[1] = (hsv_point_left[1] / 255)*100
+			hsv_point_left[2] = (hsv_point_left[2] / 255)*100
+
+			hsv_point_right[0] = hsv_point_right[0] * 2
+			hsv_point_right[1] = (hsv_point_right[1] / 255)*100
+			hsv_point_right[2] = (hsv_point_right[2] / 255)*100
+
+			hsv_point_top[0] = hsv_point_top[0] * 2
+			hsv_point_top[1] = (hsv_point_top[1] / 255)*100
+			hsv_point_top[2] = (hsv_point_top[2] / 255)*100
+
+			hsv_point_bot[0] = hsv_point_bot[0] * 2
+			hsv_point_bot[1] = (hsv_point_bot[1] / 255)*100
+			hsv_point_bot[2] = (hsv_point_bot[2] / 255)*100
+
+			pink = (255,20,147)
+			print(left[0])
+			print(left[1])
+			cv2.circle(cv_image, (int(left[0]),int(left[1])), 3,pink)
+			cv2.circle(cv_image, (int(right[0]),int(right[1])), 3,pink)
+			cv2.circle(cv_image, (int(top[0]),int(top[1])), 3,pink)
+			cv2.circle(cv_image, (int(bot[0]),int(bot[1])), 3,pink)
+			#points_coords = []
+			#points_coords.append([bgr_point_left,hsv_point_left,[left[0],left[1]],filename,target_color])
+			#points_coords.append([bgr_point_right,hsv_point_right,[right[0],right[1]],filename,target_color])
+			#points_coords.append([bgr_point_top,hsv_point_top,[top[0],top[1]],filename,target_color])
+			#points_coords.append([bgr_point_bot,hsv_point_bot,[bot[0],bot[1]],filename,target_color])
+			points_coords_real = []
+			points_coords_real.append([bgr_point_left[2],bgr_point_left[1],bgr_point_left[0],hsv_point_left[0],hsv_point_left[1],hsv_point_left[2],target_color])
+			points_coords_real.append([bgr_point_right[2],bgr_point_right[1],bgr_point_right[0],hsv_point_right[0],hsv_point_right[1],hsv_point_right[2],target_color])
+			points_coords_real.append([bgr_point_top[2],bgr_point_top[1],bgr_point_top[0],hsv_point_top[0],hsv_point_top[1],hsv_point_top[2],target_color])
+			points_coords_real.append([bgr_point_bot[2],bgr_point_bot[1],bgr_point_bot[0],hsv_point_bot[0],hsv_point_bot[1],hsv_point_bot[2],target_color])
+			#with open("results/results.csv", "a") as csvfile:
+			#	pointswriter = csv.writer(csvfile, delimiter=',',quotechar='"', quoting=csv.QUOTE_ALL)
+			#	for point in points_coords:
+			#		pointswriter.writerow(point)
+
+			#with open("results/results_real.csv", "a") as csvfile:
+			#	pointswriter = csv.writer(csvfile, delimiter=',',quotechar='"', quoting=csv.QUOTE_ALL)
+				#pointswriter.writerow(["R","G","B","H","S","V","barva"])
+			#	for point in points_coords_real:
+			#		pointswriter.writerow(point)
+			cv2.ellipse(cv_image, e1, (0, 255, 0), 2)  #zunanji (elipsa)
+			cv2.ellipse(cv_image, e2, (0, 255, 0), 2) #notranji (elipsa)
+			for point in points_coords_real:
+				color_name = predictColor(point)
+				cv2.putText(cv_image, color_name, (10,20), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 255, 255), lineType=cv2.LINE_AA)
+			# depth_image = self.bridge.imgmsg_to_cv2(depth_img, "16UC1")
+			#print(x_min)
+			#print(x_max)
+			#print(y_min)
+			#print(y_max)
+
+			#depth_image = depth_image[0: sizeY/5*4, 0:sizeX/5*4]
+			only_ring_img = cv_image[int(y_min):int(y_max),int(x_min):int(x_max)]
+			qrDetector(only_ring_img)
+
+
+			cv2.imshow("Image window",only_ring_img)
+			cv2.waitKey(4000)
+			cv2.destroyAllWindows()
+			#cv2.startWindowThread()
+			cv2.imshow("Image window",cv_image)
+			cv2.waitKey(4000)
+			cv2.destroyAllWindows()
+			#print(depth_image)
+			#print(float(np.mean(depth_image[0:1, 0:1]))/1000.0)
+
+			#print(float(np.mean(depth_image[x_min:x_max,y_min:y_max]))/1000.0)
+
+			#self.get_pose(e1, float(np.mean(depth_image[x_min:x_max,y_min:y_max]))/1000.0)
+
+			print("boom")
+
+            #cv2.imshow("Image window",cv_image)
             #cv2.waitKey(0)
-            #print(depth_image)
-            #print(float(np.mean(depth_image[0:1, 0:1]))/1000.0)
 
-            #print(float(np.mean(depth_image[x_min:x_max,y_min:y_max]))/1000.0)
-
-            self.get_pose(e1, float(np.mean(depth_image[x_min:x_max,y_min:y_max]))/1000.0)
-
-	print("boom")
-        #cv2.imshow("Image window",cv_image)
-        #cv2.waitKey(0)
-
-	#rospy.signal_shutdown("lol")
-	#sys.exit(0)
-# KODA!!!!!
+            #rospy.signal_shutdown("lol")
+            #sys.exit(0)
+            # KODA!!!!!
     def depth_callback(self,data):
 
         try:
@@ -300,6 +431,62 @@ class The_Ring:
 
         #cv2.imshow("Depth window", image_viz)
         #cv2.waitKey(1)
+def predictColor(point_val):
+	#[bgr_point_top[2],bgr_point_top[1],bgr_point_top[0],
+	#hsv_point_top[0],hsv_point_top[1],hsv_point_top[2],]
+	# stuff
+	ret_text = ""
+	if(point_val[0]<57):
+		if(point_val[3]>=181.5):
+			ret_text="blue"
+		else:
+			ret_text="green"
+	else:
+		if(point_val[1]<75.5):
+			ret_text="red"
+		else:
+			ret_text="yellow"
+	return ret_text
+
+def qrDetector(cv_image):
+	###########################################
+    #### This is relevant for exercise 8
+    ###########################################
+    print('Ring detected! (hopefully)')
+
+    # Find a QR code in the image
+    decodedObjects = pyzbar.decode(cv_image)
+
+    #print(decodedObjects)
+
+    if len(decodedObjects) == 1:
+        dObject = decodedObjects[0]
+        print("Found 1 QR code in the image!")
+        print("Data: ", dObject.data,'\n')
+
+        # Visualize the detected QR code in the image
+        points  = dObject.polygon
+        if len(points) > 4 :
+            hull = cv2.convexHull(np.array([point for point in points], dtype=np.float32))
+            hull = list(map(tuple, np.squeeze(hull)))
+        else :
+            hull = points;
+
+        ## Number of points in the convex hull
+        n = len(hull)
+
+        ## Draw the convext hull
+        for j in range(0,n):
+            cv2.line(cv_image, hull[j], hull[ (j+1) % n], (0,255,0), 2)
+
+        # cv2.imshow('Warped image',cv_image)
+        # cv2.waitKey(1)
+        cv2.imwrite( "qr/output_qr.bmp", cv_image );
+
+    elif len(decodedObjects)==0:
+        print("No QR code in the image")
+    else:
+        print("Found more than 1 QR code")
 
 def main(args):
     print("fuck")
